@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import webbrowser
+import random
 
 
 SUMO_TUTORIAL_URL = (
@@ -14,7 +15,7 @@ HITSELECT_TUTORIAL_URL = (
     "?share_source=copy_web&vd_source=9aaaf66120b154a6b6a64bed15db944d"
 )
 
-GITHUB_URL = "https://github.com/yourname/yourrepo"
+GITHUB_URL = "https://github.com/icytropicalfish/fmOptimizer"
 
 
 YELLOW = "\033[93m"
@@ -30,7 +31,7 @@ RESET = "\033[0m"
 def initialize_console():
     if os.name == "nt":
         os.system("")
-        os.system("title Minecraft PvP Optimizer")
+        os.system("title FM Minecraft PvP Optimizer")
 
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -46,18 +47,46 @@ def pause():
     input(f"\n{GRAY}按 Enter 返回主菜单...{RESET}")
 
 
-def loading(message="Loading", duration=2.4):
-    print(f"\n{YELLOW}{message}{RESET}", end="", flush=True)
+def loading(message="Loading"):
+    duration = random.randint(10, 30)
+    start_time = time.monotonic()
+    animation = ["", ".", "..", "..."]
+    frame = 0
+    print("\033[?25l", end="", flush=True)
 
-    dot_count = 6
-    delay = duration / dot_count
+    try:
+        while True:
+            elapsed = time.monotonic() - start_time
 
-    for _ in range(dot_count):
-        time.sleep(delay)
-        print(".", end="", flush=True)
+            if elapsed >= duration:
+                break
 
-    print()
-    time.sleep(0.4)
+            percentage = min(
+                int((elapsed / duration) * 100),
+                99
+            )
+
+            dots = animation[frame % len(animation)]
+
+            print(
+                f"\r{YELLOW}{message}{dots:<3} "
+                f"[{percentage:3d}%]{RESET}",
+                end="",
+                flush=True
+            )
+
+            frame += 1
+            time.sleep(0.35)
+
+        print(
+            f"\r{GREEN}{message}... [100%]{RESET}"
+            + " " * 10
+        )
+
+        time.sleep(random.randint(1, 5))
+
+    finally:
+        print("\033[?25h", end="", flush=True)
 
 
 def open_url(url):
@@ -66,15 +95,59 @@ def open_url(url):
 
         if not opened:
             print(
-                f"\n{RED}无法自动打开浏览器。{RESET}\n"
+                f"\n{RED}无法自动打开浏览器. {RESET}\n"
                 f"请手动访问：{url}"
             )
 
     except webbrowser.Error:
         print(
-            f"\n{RED}无法调用默认浏览器。{RESET}\n"
+            f"\n{RED}无法调用默认浏览器. {RESET}\n"
             f"请手动访问：{url}"
         )
+
+def play_terminal_rickroll():
+    try:
+        from ascii_rickroll import rickroll
+
+    except ImportError:
+        clear_console()
+
+        print(
+            f"{RED}"
+            "无法导入 ascii_rickroll. "
+            f"{RESET}"
+        )
+
+        print(
+            "\n请确认 ascii_rickroll 已安装到"
+            "当前正在运行 main.py 的 Python 环境中. "
+        )
+
+        return False
+
+    try:
+        rickroll()
+        return True
+
+    except KeyboardInterrupt:
+        return True
+
+    except Exception as error:
+        clear_console()
+
+        print(
+            f"{RED}"
+            "ASCII Rick Roll 播放失败. "
+            f"{RESET}"
+        )
+
+        print(
+            f"\n错误类型：{type(error).__name__}"
+            f"\n错误信息：{error}"
+        )
+
+        return False
+
 
 
 def print_banner():
@@ -92,10 +165,15 @@ def print_banner():
         "=========================================================================="
         + RESET
     )
-
     print(
         f"{GRAY}"
-        "  Professional Minecraft network and knockback optimization utility"
+        "本程序没有任何 hook/注入行为以及对游戏的修改行为. \n 一切优化均不通过修改游戏Qos/TCP(netsh/registery)以获得效用. \n 除Less KB以外在一切RBW服务器中允许使用，\n 没有在职官方RBW服务器管理正在使用本优化器. "
+        f"{RESET}"
+    )
+    
+    print(
+        f"{GRAY}"
+        "  fool me once, shame on me. fool me twice, shame on you"
         f"{RESET}"
     )
 
@@ -113,12 +191,6 @@ def show_main_menu():
     print()
     print(f"  {YELLOW}[0]{RESET}  Exit")
 
-    print(
-        f"\n{GRAY}"
-        "  Select an optimization profile by entering its number."
-        f"{RESET}"
-    )
-
 def best_kb():
     clear_console()
     print_banner()
@@ -127,7 +199,7 @@ def best_kb():
     print_banner()
 
     print(
-        f"{YELLOW}检测到主要性能瓶颈："
+        f"{YELLOW}检测到您的主要性能瓶颈："
         f"{WHITE}技术{RESET}"
     )
 
@@ -158,7 +230,7 @@ def best_kb():
         if choice == "1":
             print(
                 f"\n{GREEN}"
-                "正在打开 SUMO 技术优化方案..."
+                "正在打开 KB 优化方案1..."
                 f"{RESET}"
             )
 
@@ -170,7 +242,7 @@ def best_kb():
         if choice == "2":
             print(
                 f"\n{GREEN}"
-                "正在打开 Hit Select 技术优化方案..."
+                "正在打开 KB 优化方案2..."
                 f"{RESET}"
             )
 
@@ -183,62 +255,17 @@ def best_kb():
             return
 
         print(
-            f"{RED}无效指令，请输入 0、1 或 2。{RESET}"
+            f"{RED}无效指令，请输入 0, 1 或 2. {RESET}"
         )
-
-def play_terminal_rickroll():
-    try:
-        from ascii_rickroll import rickroll
-
-    except ImportError:
-        clear_console()
-
-        print(
-            f"{RED}"
-            "无法导入 ascii_rickroll。"
-            f"{RESET}"
-        )
-
-        print(
-            "\n请确认 ascii_rickroll 已安装到"
-            "当前正在运行 main.py 的 Python 环境中。"
-        )
-
-        return False
-
-    try:
-        rickroll()
-        return True
-
-    except KeyboardInterrupt:
-        return True
-
-    except Exception as error:
-        clear_console()
-
-        print(
-            f"{RED}"
-            "ASCII Rick Roll 播放失败。"
-            f"{RESET}"
-        )
-
-        print(
-            f"\n错误类型：{type(error).__name__}"
-            f"\n错误信息：{error}"
-        )
-
-        return False
-
 
 def best_reg():
     clear_console()
     print_banner()
 
-    loading("Loading Best Reg profile", duration=3.0)
+    loading("Loading Best Reg profile")
 
     clear_console()
 
-    # 播放终端 ASCII Rick Roll
     play_terminal_rickroll()
 
     clear_console()
@@ -246,13 +273,13 @@ def best_reg():
 
     print(
         f"{RED}"
-        "抱歉，优化器无法解决物理距离造成的 Hitreg 问题。"
+        "抱歉，优化器无法解决物理距离造成的 Hitreg 问题. "
         f"{RESET}"
     )
 
     print(
         "\n请尝试更改您的地球 Online地区设置，"
-        "或者购买加速器。"
+        "或者购买加速器. "
     )
 
     print(
@@ -281,7 +308,7 @@ def less_kb():
     print(
         "\n如果你想通过外部软件直接减少自己受到的 KB，"
         "\n而不是通过走位, 疾跑重置或操作技术，"
-        "\n那么只有作弊这一种途径。"
+        "\n那么只有作弊这一种途径. "
     )
 
     print(
@@ -291,7 +318,7 @@ def less_kb():
 
     print(
         f"\n{GRAY}"
-        "该配置属于作弊功能，本优化器拒绝执行。"
+        "该配置属于作弊功能，本优化器拒绝执行. "
         f"{RESET}"
     )
 
@@ -308,7 +335,7 @@ def reset_to_default():
 
     print(
         f"{GREEN}"
-        "明智的选择。"
+        "明智的选择. "
         f"{RESET}"
     )
 
@@ -318,25 +345,25 @@ def reset_to_default():
     )
 
     print(
-        "\n所有优化配置均已恢复至默认状态。"
+        "\n所有优化配置均已恢复至默认状态. "
     )
 
     print(
         f"\n{GRAY}"
         "Restored settings: 0"
-        "\n本程序从未修改任何注册表、网络或游戏设置。"
+        "\n本程序从未修改任何注册表、网络或游戏设置. "
         f"{RESET}"
     )
 
     print(
         "\n如果该优化器对你有帮助，"
-        "请在 GitHub 上给我点一个 Star。"
+        "请在 GitHub 上给我点一个 Star. "
     )
 
     if "yourname/yourrepo" in GITHUB_URL:
         print(
             f"\n{GRAY}"
-            "GitHub 仓库地址尚未配置。"
+            "GitHub 仓库地址尚未配置. "
             f"{RESET}"
         )
 
